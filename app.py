@@ -53,7 +53,7 @@ def check_new_mails():
               body = body.get_payload(0)
             body = body.get_payload(decode=True).decode('utf-8')
           store_in_firestore(
-            datetime.strptime(new_mail['date'], '%a, %d %b %Y %H:%M:%S %z').strftime('%d %b %Y, %H:%M:%S %z'),
+            new_mail['date'],
             {
               'customerEmail': re.sub(r'[<>]', '', new_mail['from']).split()[-1],
               'subject': new_mail['subject'],
