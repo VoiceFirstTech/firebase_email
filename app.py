@@ -43,27 +43,33 @@ def check_new_mails():
       typ, data = mail.fetch(num,'(RFC822)')
       for response_part in data:
         if isinstance(response_part, tuple):
-          new_mail = email.message_from_string(response_part[1].decode('utf-8'))
-          body = ''
           try:
-            body = new_mail.get_payload(decode=True).decode('utf-8')
+            new_mail = email.message_from_string(response_part[1].decode('utf-8'))
+            body = ''
+            try:
+              body = new_mail.get_payload(decode=True).decode('utf-8')
+            except:
+              body = new_mail.get_payload(0)
+              while body.is_multipart():
+                body = body.get_payload(0)
+              body = body.get_payload(decode=True).decode('utf-8')
+            store_in_firestore(
+              new_mail['date'],
+              {
+                'customerEmail': re.sub(r'[<>]', '', new_mail['from']).split()[-1],
+                'subject': new_mail['subject'],
+                'body': body
+              }
+            )
+            typ, data = mail.store(num,'+FLAGS','\\Seen')
           except:
-            body = new_mail.get_payload(0)
-            while body.is_multipart():
-              body = body.get_payload(0)
-            body = body.get_payload(decode=True).decode('utf-8')
-          store_in_firestore(
-            new_mail['date'],
-            {
-              'customerEmail': re.sub(r'[<>]', '', new_mail['from']).split()[-1],
-              'subject': new_mail['subject'],
-              'body': body
-            }
-          )
-          typ, data = mail.store(num,'+FLAGS','\\Seen')
+            pass
 
 if __name__ == '__main__':
   while True:
-    check_new_mails()
+    try:
+      check_new_mails()
+    except:
+      pass
     time.sleep(POLLING_INTERVAL)
 
