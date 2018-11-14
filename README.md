@@ -14,7 +14,7 @@
 11. To close the app, reattach to screen by executing `screen -r app` and press `Ctrl+C`.
 
 
-# Running (Already Setup)
+## Running (Already Setup)
 
 If your app is already setup by following previous steps, follow these steps -
 1. SSH into the terminal or activate cloud shell.
